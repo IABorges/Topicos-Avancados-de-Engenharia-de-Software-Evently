@@ -1,0 +1,768 @@
+{
+  "info": {
+    "name": "Evently - Serviço de Ingressos",
+    "description": "Cenários do contrato IIngresso. Execute em ordem (Run collection) começando pelo reset.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "00 Reset dos dados de demonstração",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/dev/reset"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('200', () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "01 confirmarPresenca - sucesso",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_ana}}"
+          }
+        ],
+        "url": "{{baseUrl}}/convites/10/confirmacao"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+              "pm.test(\"conviteId = 10\", () => pm.expect(pm.response.json()[\"conviteId\"]).to.eql(10));",
+              "pm.test(\"situacao = 'CONFIRMADO'\", () => pm.expect(pm.response.json()[\"situacao\"]).to.eql(\"CONFIRMADO\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 confirmarPresenca - convite já respondido",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_ana}}"
+          }
+        ],
+        "url": "{{baseUrl}}/convites/10/confirmacao"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));",
+              "pm.test(\"codigo CONVITE_JA_RESPONDIDO\", () => pm.expect(pm.response.json().codigo).to.eql(\"CONVITE_JA_RESPONDIDO\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 confirmarPresenca - sem token",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/convites/11/confirmacao"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));",
+              "pm.test(\"codigo NAO_AUTENTICADO\", () => pm.expect(pm.response.json().codigo).to.eql(\"NAO_AUTENTICADO\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 confirmarPresenca - convite inexistente",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_ana}}"
+          }
+        ],
+        "url": "{{baseUrl}}/convites/999/confirmacao"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));",
+              "pm.test(\"codigo CONVITE_NAO_ENCONTRADO\", () => pm.expect(pm.response.json().codigo).to.eql(\"CONVITE_NAO_ENCONTRADO\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 confirmarPresenca - usuário não é o titular",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_intruso}}"
+          }
+        ],
+        "url": "{{baseUrl}}/convites/11/confirmacao"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));",
+              "pm.test(\"codigo NAO_TITULAR\", () => pm.expect(pm.response.json().codigo).to.eql(\"NAO_TITULAR\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 confirmarPresenca - convite expirado",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_elisa}}"
+          }
+        ],
+        "url": "{{baseUrl}}/convites/14/confirmacao"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 422\", () => pm.response.to.have.status(422));",
+              "pm.test(\"codigo CONVITE_EXPIRADO\", () => pm.expect(pm.response.json().codigo).to.eql(\"CONVITE_EXPIRADO\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 confirmarPresenca - evento sem vagas",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_gustavo}}"
+          }
+        ],
+        "url": "{{baseUrl}}/convites/21/confirmacao"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));",
+              "pm.test(\"codigo SEM_VAGAS\", () => pm.expect(pm.response.json().codigo).to.eql(\"SEM_VAGAS\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 confirmarPresenca - falha na trilha (desfeita)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_julia}}"
+          }
+        ],
+        "url": "{{baseUrl}}/convites/50/confirmacao"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 503\", () => pm.response.to.have.status(503));",
+              "pm.test(\"codigo FALHA_DEPENDENCIA\", () => pm.expect(pm.response.json().codigo).to.eql(\"FALHA_DEPENDENCIA\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 recusarConvite - sucesso",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_bruno}}"
+          }
+        ],
+        "url": "{{baseUrl}}/convites/11/recusa"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"conviteId = 11\", () => pm.expect(pm.response.json()[\"conviteId\"]).to.eql(11));",
+              "pm.test(\"situacao = 'RECUSADO'\", () => pm.expect(pm.response.json()[\"situacao\"]).to.eql(\"RECUSADO\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 registrarDesistencia - sucesso",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_carla}}"
+          }
+        ],
+        "url": "{{baseUrl}}/convites/12/desistencia"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"situacao = 'DESISTENTE'\", () => pm.expect(pm.response.json()[\"situacao\"]).to.eql(\"DESISTENTE\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 registrarDesistencia - evento já iniciado",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_helena}}"
+          }
+        ],
+        "url": "{{baseUrl}}/convites/30/desistencia"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 422\", () => pm.response.to.have.status(422));",
+              "pm.test(\"codigo EVENTO_INICIADO\", () => pm.expect(pm.response.json().codigo).to.eql(\"EVENTO_INICIADO\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 registrarDesistencia - sem ingresso confirmado",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_bruno}}"
+          }
+        ],
+        "url": "{{baseUrl}}/convites/11/desistencia"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));",
+              "pm.test(\"codigo SEM_INGRESSO_CONFIRMADO\", () => pm.expect(pm.response.json().codigo).to.eql(\"SEM_INGRESSO_CONFIRMADO\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "13 transferirConvite - dados do substituto inválidos",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_diego}}"
+          }
+        ],
+        "url": "{{baseUrl}}/convites/13/transferencia",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"dadosSubstituto\": {\n    \"nome\": \"\",\n    \"email\": \"email-invalido\"\n  }\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "pm.test(\"codigo DADOS_INVALIDOS\", () => pm.expect(pm.response.json().codigo).to.eql(\"DADOS_INVALIDOS\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "14 transferirConvite - substituto já convidado",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_diego}}"
+          }
+        ],
+        "url": "{{baseUrl}}/convites/13/transferencia",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"dadosSubstituto\": {\n    \"nome\": \"Ana Lima\",\n    \"email\": \"ana@evently.test\"\n  }\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));",
+              "pm.test(\"codigo SUBSTITUTO_JA_CONVIDADO\", () => pm.expect(pm.response.json().codigo).to.eql(\"SUBSTITUTO_JA_CONVIDADO\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "15 transferirConvite - sucesso",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_diego}}"
+          }
+        ],
+        "url": "{{baseUrl}}/convites/13/transferencia",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"dadosSubstituto\": {\n    \"nome\": \"Maria Souza\",\n    \"email\": \"maria.souza@empresa.com\"\n  }\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"situacao = 'TRANSFERIDO'\", () => pm.expect(pm.response.json()[\"situacao\"]).to.eql(\"TRANSFERIDO\"));",
+              "pm.test(\"novoConviteId = 1000\", () => pm.expect(pm.response.json()[\"novoConviteId\"]).to.eql(1000));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "16 transferirConvite - não permitida pelo evento",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_igor}}"
+          }
+        ],
+        "url": "{{baseUrl}}/convites/40/transferencia",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"dadosSubstituto\": {\n    \"nome\": \"Maria Souza\",\n    \"email\": \"maria.souza@empresa.com\"\n  }\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 422\", () => pm.response.to.have.status(422));",
+              "pm.test(\"codigo TRANSFERENCIA_NAO_PERMITIDA\", () => pm.expect(pm.response.json().codigo).to.eql(\"TRANSFERENCIA_NAO_PERMITIDA\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "17 confirmarPresenca - substituto usa a vaga reservada",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_maria}}"
+          }
+        ],
+        "url": "{{baseUrl}}/convites/1000/confirmacao"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+              "pm.test(\"conviteId = 1000\", () => pm.expect(pm.response.json()[\"conviteId\"]).to.eql(1000));",
+              "pm.test(\"situacao = 'CONFIRMADO'\", () => pm.expect(pm.response.json()[\"situacao\"]).to.eql(\"CONFIRMADO\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "18 consultarIngresso - portaria por qrCode (desistente, QR inválido)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_portaria}}"
+          }
+        ],
+        "url": "{{baseUrl}}/ingressos?qrCode=EVT-C12A0001"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"situacao = 'DESISTENTE'\", () => pm.expect(pm.response.json()[\"situacao\"]).to.eql(\"DESISTENTE\"));",
+              "pm.test(\"qrValido = false\", () => pm.expect(pm.response.json()[\"qrValido\"]).to.eql(false));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "19 consultarIngresso - organizador por conviteId",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_organizador}}"
+          }
+        ],
+        "url": "{{baseUrl}}/ingressos?conviteId=10"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"situacao = 'CONFIRMADO'\", () => pm.expect(pm.response.json()[\"situacao\"]).to.eql(\"CONFIRMADO\"));",
+              "pm.test(\"qrValido = true\", () => pm.expect(pm.response.json()[\"qrValido\"]).to.eql(true));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "20 consultarIngresso - titular por ingressoId",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_bruno}}"
+          }
+        ],
+        "url": "{{baseUrl}}/ingressos/101"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"situacao = 'RECUSADO'\", () => pm.expect(pm.response.json()[\"situacao\"]).to.eql(\"RECUSADO\"));",
+              "pm.test(\"qrValido = false\", () => pm.expect(pm.response.json()[\"qrValido\"]).to.eql(false));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "21 consultarIngresso - nenhum identificador",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_portaria}}"
+          }
+        ],
+        "url": "{{baseUrl}}/ingressos"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "pm.test(\"codigo DADOS_INVALIDOS\", () => pm.expect(pm.response.json().codigo).to.eql(\"DADOS_INVALIDOS\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "22 consultarIngresso - QR Code inexistente",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_portaria}}"
+          }
+        ],
+        "url": "{{baseUrl}}/ingressos?qrCode=EVT-NAOEXISTE"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));",
+              "pm.test(\"codigo INGRESSO_NAO_ENCONTRADO\", () => pm.expect(pm.response.json().codigo).to.eql(\"INGRESSO_NAO_ENCONTRADO\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "23 consultarIngresso - usuário sem permissão",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_intruso}}"
+          }
+        ],
+        "url": "{{baseUrl}}/ingressos?conviteId=10"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));",
+              "pm.test(\"codigo ACESSO_NEGADO\", () => pm.expect(pm.response.json().codigo).to.eql(\"ACESSO_NEGADO\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "24 saldo de vagas do evento 1 (organizador)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_organizador}}"
+          }
+        ],
+        "url": "{{baseUrl}}/eventos/1/vagas"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"capacidade = 3\", () => pm.expect(pm.response.json()[\"capacidade\"]).to.eql(3));",
+              "pm.test(\"ocupadas = 2\", () => pm.expect(pm.response.json()[\"ocupadas\"]).to.eql(2));",
+              "pm.test(\"reservadas = 0\", () => pm.expect(pm.response.json()[\"reservadas\"]).to.eql(0));",
+              "pm.test(\"disponiveis = 1\", () => pm.expect(pm.response.json()[\"disponiveis\"]).to.eql(1));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "25 eventos de domínio publicados (assíncrono)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/dev/eventos-publicados"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
