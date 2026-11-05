@@ -91,7 +91,8 @@ salva em `docs/evidencias/execucao-api.md`.
 1. Suba o servidor com `npm run dev`.
 2. Importe os dois arquivos da pasta `postman/`:
    - `Evently-Servico-Ingressos.postman_collection.json`: as requisições, já numeradas.
-   - `Evently-local.postman_environment.json`: o endereço da API e o token de cada usuário de teste.
+   - `Evently-local.postman_environment.json` (Postman) ou `Evently-local.bruno_environment.json` (Bruno):
+     o endereço da API e o token de cada usuário de teste.
 3. Selecione o ambiente **Evently - local**.
 4. Rode as requisições **na ordem numérica**, começando pela **00 Reset**, ou use **Run collection**.
 
