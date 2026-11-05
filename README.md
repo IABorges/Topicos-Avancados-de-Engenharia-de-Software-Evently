@@ -15,8 +15,8 @@ npm run dev          # API em http://localhost:3000
 Testes:
 
 ```bash
-npm test             # 36 testes automatizados (Vitest) sobre os Route Handlers
-npm run test:api     # 25 cenários contra o servidor em execução; gera docs/evidencias/execucao-api.md
+npm test             # 37 testes automatizados (Vitest) sobre os Route Handlers
+npm run test:api     # 26 cenários contra o servidor em execução; gera docs/evidencias/execucao-api.md
 ```
 
 Postman: importe `postman/Evently-Servico-Ingressos.postman_collection.json` e o ambiente
@@ -80,6 +80,6 @@ Outros usuários: `intruso` (convidado sem convite), `organizador` (dono dos eve
   reinicia. Trocar por Supabase/Resend exige apenas novos adaptadores, sem mudar o domínio.
 - A reserva atômica de vagas usa a execução em uma única thread do Node.js. Com várias instâncias, ela
   precisaria de uma operação atômica no banco (por exemplo, `UPDATE ... WHERE ocupadas < capacidade`).
-- A liberação automática da vaga quando o convite do substituto **expira** sem resposta (seção 3.3) não está
+- A liberação automática da vaga quando o convite do substituto **expira** sem resposta não está
   implementada, porque depende de um agendador. A liberação na **recusa** do substituto está implementada.
 - Fora de produção, sem `SUPABASE_JWT_SECRET`, o serviço usa um segredo local fixo para validar os tokens.
