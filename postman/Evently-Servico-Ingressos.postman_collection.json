@@ -385,7 +385,12 @@
         "url": "{{baseUrl}}/convites/13/transferencia",
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"dadosSubstituto\": {\n    \"nome\": \"\",\n    \"email\": \"email-invalido\"\n  }\n}"
+          "raw": "{\n  \"dadosSubstituto\": {\n    \"nome\": \"\",\n    \"email\": \"email-invalido\"\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
         }
       },
       "event": [
@@ -418,7 +423,12 @@
         "url": "{{baseUrl}}/convites/13/transferencia",
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"dadosSubstituto\": {\n    \"nome\": \"Ana Lima\",\n    \"email\": \"ana@evently.test\"\n  }\n}"
+          "raw": "{\n  \"dadosSubstituto\": {\n    \"nome\": \"Ana Lima\",\n    \"email\": \"ana@evently.test\"\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
         }
       },
       "event": [
@@ -451,7 +461,12 @@
         "url": "{{baseUrl}}/convites/13/transferencia",
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"dadosSubstituto\": {\n    \"nome\": \"Maria Souza\",\n    \"email\": \"maria.souza@empresa.com\"\n  }\n}"
+          "raw": "{\n  \"dadosSubstituto\": {\n    \"nome\": \"Maria Souza\",\n    \"email\": \"maria.souza@empresa.com\"\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
         }
       },
       "event": [
@@ -485,7 +500,12 @@
         "url": "{{baseUrl}}/convites/40/transferencia",
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"dadosSubstituto\": {\n    \"nome\": \"Maria Souza\",\n    \"email\": \"maria.souza@empresa.com\"\n  }\n}"
+          "raw": "{\n  \"dadosSubstituto\": {\n    \"nome\": \"Maria Souza\",\n    \"email\": \"maria.souza@empresa.com\"\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
         }
       },
       "event": [
@@ -548,7 +568,12 @@
         "url": "{{baseUrl}}/convites/1000/transferencia",
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"dadosSubstituto\": {\n    \"nome\": \"Paulo Lima\",\n    \"email\": \"paulo.lima@empresa.com\"\n  }\n}"
+          "raw": "{\n  \"dadosSubstituto\": {\n    \"nome\": \"Paulo Lima\",\n    \"email\": \"paulo.lima@empresa.com\"\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
         }
       },
       "event": [

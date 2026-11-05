@@ -27,7 +27,9 @@ const item = [
         method: c.metodo,
         header: headers,
         url: `{{baseUrl}}${c.caminho}`,
-        ...(c.corpo !== undefined ? { body: { mode: "raw", raw: JSON.stringify(c.corpo, null, 2) } } : {}),
+        ...(c.corpo !== undefined
+          ? { body: { mode: "raw", raw: JSON.stringify(c.corpo, null, 2), options: { raw: { language: "json" } } } }
+          : {}),
       },
       event: [{ listen: "test", script: { type: "text/javascript", exec: testes } }],
     };
