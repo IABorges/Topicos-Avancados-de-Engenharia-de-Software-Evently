@@ -1,6 +1,6 @@
 # Evidência de execução da API - Serviço de Ingressos
 
-Execução: 2026-11-05T09:28:26.298Z contra `http://localhost:3000` (servidor Next.js em execução).
+Execução: 2026-11-05T10:00:42.919Z contra `http://localhost:3000` (servidor Next.js em execução).
 Antes do roteiro: `POST /dev/reset` (massa de dados inicial).
 
 | # | Cenário | Requisição | Esperado | Obtido | Resultado |
@@ -22,16 +22,17 @@ Antes do roteiro: `POST /dev/reset` (massa de dados inicial).
 | 15 | transferirConvite - sucesso | `POST /convites/13/transferencia` (diego) | 200 | 200 | OK |
 | 16 | transferirConvite - não permitida pelo evento | `POST /convites/40/transferencia` (igor) | 422 TRANSFERENCIA_NAO_PERMITIDA | 422 TRANSFERENCIA_NAO_PERMITIDA | OK |
 | 17 | confirmarPresenca - substituto usa a vaga reservada | `POST /convites/1000/confirmacao` (maria) | 201 | 201 | OK |
-| 18 | consultarIngresso - portaria por qrCode (desistente, QR inválido) | `GET /ingressos?qrCode=EVT-C12A0001` (portaria) | 200 | 200 | OK |
-| 19 | consultarIngresso - organizador por conviteId | `GET /ingressos?conviteId=10` (organizador) | 200 | 200 | OK |
-| 20 | consultarIngresso - titular por ingressoId | `GET /ingressos/101` (bruno) | 200 | 200 | OK |
-| 21 | consultarIngresso - nenhum identificador | `GET /ingressos` (portaria) | 400 DADOS_INVALIDOS | 400 DADOS_INVALIDOS | OK |
-| 22 | consultarIngresso - QR Code inexistente | `GET /ingressos?qrCode=EVT-NAOEXISTE` (portaria) | 404 INGRESSO_NAO_ENCONTRADO | 404 INGRESSO_NAO_ENCONTRADO | OK |
-| 23 | consultarIngresso - usuário sem permissão | `GET /ingressos?conviteId=10` (intruso) | 403 ACESSO_NEGADO | 403 ACESSO_NEGADO | OK |
-| 24 | saldo de vagas do evento 1 (organizador) | `GET /eventos/1/vagas` (organizador) | 200 | 200 | OK |
-| 25 | eventos de domínio publicados (assíncrono) | `GET /dev/eventos-publicados` (sem token) | 200 | 200 | OK |
+| 18 | transferirConvite - ingresso recebido por transferência | `POST /convites/1000/transferencia` (maria) | 422 TRANSFERENCIA_NAO_PERMITIDA | 422 TRANSFERENCIA_NAO_PERMITIDA | OK |
+| 19 | consultarIngresso - portaria por qrCode (desistente, QR inválido) | `GET /ingressos?qrCode=EVT-C12A0001` (portaria) | 200 | 200 | OK |
+| 20 | consultarIngresso - organizador por conviteId | `GET /ingressos?conviteId=10` (organizador) | 200 | 200 | OK |
+| 21 | consultarIngresso - titular por ingressoId | `GET /ingressos/101` (bruno) | 200 | 200 | OK |
+| 22 | consultarIngresso - nenhum identificador | `GET /ingressos` (portaria) | 400 DADOS_INVALIDOS | 400 DADOS_INVALIDOS | OK |
+| 23 | consultarIngresso - QR Code inexistente | `GET /ingressos?qrCode=EVT-NAOEXISTE` (portaria) | 404 INGRESSO_NAO_ENCONTRADO | 404 INGRESSO_NAO_ENCONTRADO | OK |
+| 24 | consultarIngresso - usuário sem permissão | `GET /ingressos?conviteId=10` (intruso) | 403 ACESSO_NEGADO | 403 ACESSO_NEGADO | OK |
+| 25 | saldo de vagas do evento 1 (organizador) | `GET /eventos/1/vagas` (organizador) | 200 | 200 | OK |
+| 26 | eventos de domínio publicados (assíncrono) | `GET /dev/eventos-publicados` (sem token) | 200 | 200 | OK |
 
-**Resumo:** 25 de 25 cenários conforme o contrato.
+**Resumo:** 26 de 26 cenários conforme o contrato.
 
 ## Requisições e respostas
 
@@ -49,8 +50,8 @@ Resposta: **HTTP 201**
   "ingressoId": 100,
   "conviteId": 10,
   "situacao": "CONFIRMADO",
-  "qrCode": "EVT-EF84BAE7",
-  "confirmadoEm": "2026-11-05T09:28:26.343Z"
+  "qrCode": "EVT-8395CBC0",
+  "confirmadoEm": "2026-11-05T10:00:43.877Z"
 }
 ```
 
@@ -338,12 +339,35 @@ Resposta: **HTTP 201**
   "ingressoId": 110,
   "conviteId": 1000,
   "situacao": "CONFIRMADO",
-  "qrCode": "EVT-D329A879",
-  "confirmadoEm": "2026-11-05T09:28:26.926Z"
+  "qrCode": "EVT-39448A0C",
+  "confirmadoEm": "2026-11-05T10:00:47.329Z"
 }
 ```
 
-### 18 consultarIngresso - portaria por qrCode (desistente, QR inválido)
+### 18 transferirConvite - ingresso recebido por transferência
+
+```http
+POST /convites/1000/transferencia
+Authorization: Bearer <token de maria>
+
+{
+  "dadosSubstituto": {
+    "nome": "Paulo Lima",
+    "email": "paulo.lima@empresa.com"
+  }
+}
+```
+
+Resposta: **HTTP 422**
+
+```json
+{
+  "codigo": "TRANSFERENCIA_NAO_PERMITIDA",
+  "mensagem": "Um ingresso recebido por transferência não pode ser transferido novamente."
+}
+```
+
+### 19 consultarIngresso - portaria por qrCode (desistente, QR inválido)
 
 ```http
 GET /ingressos?qrCode=EVT-C12A0001
@@ -367,7 +391,7 @@ Resposta: **HTTP 200**
 }
 ```
 
-### 19 consultarIngresso - organizador por conviteId
+### 20 consultarIngresso - organizador por conviteId
 
 ```http
 GET /ingressos?conviteId=10
@@ -386,12 +410,12 @@ Resposta: **HTTP 200**
     "email": "ana@evently.test"
   },
   "situacao": "CONFIRMADO",
-  "qrCode": "EVT-EF84BAE7",
+  "qrCode": "EVT-8395CBC0",
   "qrValido": true
 }
 ```
 
-### 20 consultarIngresso - titular por ingressoId
+### 21 consultarIngresso - titular por ingressoId
 
 ```http
 GET /ingressos/101
@@ -414,7 +438,7 @@ Resposta: **HTTP 200**
 }
 ```
 
-### 21 consultarIngresso - nenhum identificador
+### 22 consultarIngresso - nenhum identificador
 
 ```http
 GET /ingressos
@@ -430,7 +454,7 @@ Resposta: **HTTP 400**
 }
 ```
 
-### 22 consultarIngresso - QR Code inexistente
+### 23 consultarIngresso - QR Code inexistente
 
 ```http
 GET /ingressos?qrCode=EVT-NAOEXISTE
@@ -446,7 +470,7 @@ Resposta: **HTTP 404**
 }
 ```
 
-### 23 consultarIngresso - usuário sem permissão
+### 24 consultarIngresso - usuário sem permissão
 
 ```http
 GET /ingressos?conviteId=10
@@ -462,7 +486,7 @@ Resposta: **HTTP 403**
 }
 ```
 
-### 24 saldo de vagas do evento 1 (organizador)
+### 25 saldo de vagas do evento 1 (organizador)
 
 ```http
 GET /eventos/1/vagas
@@ -481,7 +505,7 @@ Resposta: **HTTP 200**
 }
 ```
 
-### 25 eventos de domínio publicados (assíncrono)
+### 26 eventos de domínio publicados (assíncrono)
 
 ```http
 GET /dev/eventos-publicados
@@ -493,8 +517,8 @@ Resposta: **HTTP 200**
 ```json
 [
   {
-    "tipo": "PresencaConfirmada",
-    "ocorridoEm": "2026-11-05T09:28:26.344Z",
+    "tipo": "IngressoConfirmado",
+    "ocorridoEm": "2026-11-05T10:00:43.878Z",
     "dados": {
       "ingressoId": 100,
       "conviteId": 10,
@@ -502,8 +526,8 @@ Resposta: **HTTP 200**
     }
   },
   {
-    "tipo": "ConviteRecusado",
-    "ocorridoEm": "2026-11-05T09:28:26.577Z",
+    "tipo": "IngressoRecusado",
+    "ocorridoEm": "2026-11-05T10:00:45.080Z",
     "dados": {
       "ingressoId": 101,
       "conviteId": 11,
@@ -512,7 +536,7 @@ Resposta: **HTTP 200**
   },
   {
     "tipo": "DesistenciaRegistrada",
-    "ocorridoEm": "2026-11-05T09:28:26.623Z",
+    "ocorridoEm": "2026-11-05T10:00:46.107Z",
     "dados": {
       "ingressoId": 102,
       "conviteId": 12,
@@ -520,8 +544,8 @@ Resposta: **HTTP 200**
     }
   },
   {
-    "tipo": "ConviteTransferido",
-    "ocorridoEm": "2026-11-05T09:28:26.864Z",
+    "tipo": "IngressoTransferido",
+    "ocorridoEm": "2026-11-05T10:00:47.270Z",
     "dados": {
       "ingressoId": 103,
       "conviteId": 13,
@@ -530,8 +554,8 @@ Resposta: **HTTP 200**
     }
   },
   {
-    "tipo": "PresencaConfirmada",
-    "ocorridoEm": "2026-11-05T09:28:26.926Z",
+    "tipo": "IngressoConfirmado",
+    "ocorridoEm": "2026-11-05T10:00:47.329Z",
     "dados": {
       "ingressoId": 110,
       "conviteId": 1000,

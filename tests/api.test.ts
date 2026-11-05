@@ -102,7 +102,7 @@ describe("confirmarPresenca - POST /convites/{conviteId}/confirmacao", () => {
     });
     expect((await saldo(1)).corpo).toMatchObject({ ocupadas: 3, disponiveis: 0 });
     expect(c.preparacao.trilhasLiberadas).toContainEqual({ eventoId: 1, conviteId: 10 });
-    expect(c.publicador.publicados.map((e) => e.tipo)).toEqual(["PresencaConfirmada"]);
+    expect(c.publicador.publicados.map((e) => e.tipo)).toEqual(["IngressoConfirmado"]);
     expect(c.notificacao.enviados).toHaveLength(1);
   });
 
@@ -170,7 +170,7 @@ describe("recusarConvite - POST /convites/{conviteId}/recusa", () => {
     expect(consulta.corpo.qrCode).toBeUndefined();
     expect(consulta.corpo.qrValido).toBe(false);
     expect((await saldo(1)).corpo.ocupadas).toBe(2);
-    expect(c.publicador.publicados.map((e) => e.tipo)).toEqual(["ConviteRecusado"]);
+    expect(c.publicador.publicados.map((e) => e.tipo)).toEqual(["IngressoRecusado"]);
   });
 
   it("recusa é definitiva: confirmar depois -> 409 CONVITE_JA_RESPONDIDO", async () => {
@@ -236,7 +236,7 @@ describe("transferirConvite - POST /convites/{conviteId}/transferencia", () => {
     });
     expect((await saldo(1)).corpo).toMatchObject({ ocupadas: 1, reservadas: 1, disponiveis: 1 });
     expect((await consultar("?conviteId=1000", "maria")).corpo).toMatchObject({ situacao: "PENDENTE" });
-    expect(c.publicador.publicados.map((e) => e.tipo)).toEqual(["ConviteTransferido"]);
+    expect(c.publicador.publicados.map((e) => e.tipo)).toEqual(["IngressoTransferido"]);
     expect(c.notificacao.enviados[0].para).toBe("maria.souza@empresa.com");
   });
 
@@ -287,6 +287,18 @@ describe("transferirConvite - POST /convites/{conviteId}/transferencia", () => {
 
   it("não titular -> 403 NAO_TITULAR", async () => {
     expect((await transferir(13, "intruso", SUBSTITUTA)).corpo.codigo).toBe("NAO_TITULAR");
+  });
+
+  it("ingresso recebido por transferência não pode ser transferido de novo -> 422 TRANSFERENCIA_NAO_PERMITIDA", async () => {
+    await transferir(13, "diego", SUBSTITUTA);
+    expect((await confirmar(1000, "maria")).status).toBe(201);
+    const outro = { dadosSubstituto: { nome: "Paulo Lima", email: "paulo.lima@empresa.com" } };
+    const r = await transferir(1000, "maria", outro);
+    expect(r).toMatchObject({ status: 422, corpo: { codigo: "TRANSFERENCIA_NAO_PERMITIDA" } });
+    expect(r.corpo.mensagem).toMatch(/recebido por transferência/);
+    // Nada muda: o ingresso da Maria continua CONFIRMADO e nenhum convite novo é emitido.
+    expect((await consultar("?conviteId=1000", "maria")).corpo.situacao).toBe("CONFIRMADO");
+    expect(await c.convites.possuiConvite(1, "paulo.lima@empresa.com")).toBe(false);
   });
 });
 

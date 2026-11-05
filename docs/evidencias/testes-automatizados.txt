@@ -1,15 +1,15 @@
 
- RUN  v3.2.7 C:/Users/igord/AppData/Local/Claude-Data/claude_pzs8sxrjxfjjc/scratch-workspaces/dab9e26e-d2f0-446e-b503-a5071c4064d6/1aa62184-89d8-4709-af01-a011e6f4d3e1/scratch-2026-11-05-fa3c08/evently-servico-ingressos
+ RUN  v3.2.7 C:/Users/igord/OneDrive/Desktop/Faculdade/Evently/evently-servico-ingressos
 
  ✓ tests/api.test.ts > Autenticação (todas as operações) > sem token -> 401 NAO_AUTENTICADO 5ms
  ✓ tests/api.test.ts > Autenticação (todas as operações) > token adulterado -> 401 NAO_AUTENTICADO 3ms
- ✓ tests/api.test.ts > Autenticação (todas as operações) > token expirado -> 401 NAO_AUTENTICADO 1ms
+ ✓ tests/api.test.ts > Autenticação (todas as operações) > token expirado -> 401 NAO_AUTENTICADO 2ms
  ✓ tests/api.test.ts > confirmarPresenca - POST /convites/{conviteId}/confirmacao > titular com convite vigente -> 201 com ingresso CONFIRMADO e QR Code 5ms
  ✓ tests/api.test.ts > confirmarPresenca - POST /convites/{conviteId}/confirmacao > convite inexistente -> 404 CONVITE_NAO_ENCONTRADO 1ms
  ✓ tests/api.test.ts > confirmarPresenca - POST /convites/{conviteId}/confirmacao > usuário que não é o titular -> 403 NAO_TITULAR 1ms
  ✓ tests/api.test.ts > confirmarPresenca - POST /convites/{conviteId}/confirmacao > convite já confirmado -> 409 CONVITE_JA_RESPONDIDO 1ms
  ✓ tests/api.test.ts > confirmarPresenca - POST /convites/{conviteId}/confirmacao > convite fora da vigência -> 422 CONVITE_EXPIRADO 1ms
- ✓ tests/api.test.ts > confirmarPresenca - POST /convites/{conviteId}/confirmacao > evento lotado -> 409 SEM_VAGAS e o ingresso continua PENDENTE 1ms
+ ✓ tests/api.test.ts > confirmarPresenca - POST /convites/{conviteId}/confirmacao > evento lotado -> 409 SEM_VAGAS e o ingresso continua PENDENTE 2ms
  ✓ tests/api.test.ts > confirmarPresenca - POST /convites/{conviteId}/confirmacao > duas confirmações simultâneas pela última vaga -> uma 201 e uma 409 SEM_VAGAS 1ms
  ✓ tests/api.test.ts > confirmarPresenca - POST /convites/{conviteId}/confirmacao > a liberação da trilha falha -> 503 FALHA_DEPENDENCIA e a vaga volta ao saldo 1ms
  ✓ tests/api.test.ts > confirmarPresenca - POST /convites/{conviteId}/confirmacao > Serviço de Vagas indisponível -> 503 FALHA_DEPENDENCIA 0ms
@@ -17,7 +17,7 @@
  ✓ tests/api.test.ts > confirmarPresenca - POST /convites/{conviteId}/confirmacao > falha no envio do e-mail não desfaz a confirmação 1ms
  ✓ tests/api.test.ts > recusarConvite - POST /convites/{conviteId}/recusa > titular recusa -> 200 RECUSADO, sem QR Code e sem ocupar vaga 1ms
  ✓ tests/api.test.ts > recusarConvite - POST /convites/{conviteId}/recusa > recusa é definitiva: confirmar depois -> 409 CONVITE_JA_RESPONDIDO 1ms
- ✓ tests/api.test.ts > recusarConvite - POST /convites/{conviteId}/recusa > não titular -> 403; expirado -> 422; já confirmado -> 409 1ms
+ ✓ tests/api.test.ts > recusarConvite - POST /convites/{conviteId}/recusa > não titular -> 403; expirado -> 422; já confirmado -> 409 2ms
  ✓ tests/api.test.ts > registrarDesistencia - POST /convites/{conviteId}/desistencia > titular confirmado desiste -> 200 DESISTENTE, QR Code invalidado e vaga liberada 1ms
  ✓ tests/api.test.ts > registrarDesistencia - POST /convites/{conviteId}/desistencia > vaga liberada pela desistência pode ser usada por outro convidado 1ms
  ✓ tests/api.test.ts > registrarDesistencia - POST /convites/{conviteId}/desistencia > sem ingresso confirmado -> 409 SEM_INGRESSO_CONFIRMADO 0ms
@@ -29,9 +29,10 @@
  ✓ tests/api.test.ts > transferirConvite - POST /convites/{conviteId}/transferencia > substituto recusa -> a vaga reservada é liberada 1ms
  ✓ tests/api.test.ts > transferirConvite - POST /convites/{conviteId}/transferencia > dados do substituto inválidos -> 400 DADOS_INVALIDOS 1ms
  ✓ tests/api.test.ts > transferirConvite - POST /convites/{conviteId}/transferencia > sem ingresso confirmado -> 409; evento iniciado -> 422; regra não permite -> 422 1ms
- ✓ tests/api.test.ts > transferirConvite - POST /convites/{conviteId}/transferencia > substituto já convidado no evento -> 409 SUBSTITUTO_JA_CONVIDADO 0ms
+ ✓ tests/api.test.ts > transferirConvite - POST /convites/{conviteId}/transferencia > substituto já convidado no evento -> 409 SUBSTITUTO_JA_CONVIDADO 1ms
  ✓ tests/api.test.ts > transferirConvite - POST /convites/{conviteId}/transferencia > transferência da vaga falha -> 503 e tudo é desfeito (convite do substituto cancelado) 1ms
- ✓ tests/api.test.ts > transferirConvite - POST /convites/{conviteId}/transferencia > não titular -> 403 NAO_TITULAR 0ms
+ ✓ tests/api.test.ts > transferirConvite - POST /convites/{conviteId}/transferencia > não titular -> 403 NAO_TITULAR 1ms
+ ✓ tests/api.test.ts > transferirConvite - POST /convites/{conviteId}/transferencia > ingresso recebido por transferência não pode ser transferido de novo -> 422 TRANSFERENCIA_NAO_PERMITIDA 1ms
  ✓ tests/api.test.ts > consultarIngresso - GET /ingressos > portaria consulta por qrCode -> 200 com qrValido verdadeiro 1ms
  ✓ tests/api.test.ts > consultarIngresso - GET /ingressos > organizador do evento consulta por conviteId; titular consulta por ingressoId 1ms
  ✓ tests/api.test.ts > consultarIngresso - GET /ingressos > nenhum ou mais de um identificador -> 400 DADOS_INVALIDOS 1ms
@@ -39,7 +40,7 @@
  ✓ tests/api.test.ts > consultarIngresso - GET /ingressos > usuário sem permissão -> 403 ACESSO_NEGADO (outro convidado e organizador de outro evento) 1ms
 
  Test Files  1 passed (1)
-      Tests  36 passed (36)
-   Start at  06:28:36
-   Duration  982ms (transform 150ms, setup 0ms, collect 290ms, tests 41ms, environment 0ms, prepare 199ms)
+      Tests  37 passed (37)
+   Start at  06:59:31
+   Duration  839ms (transform 150ms, setup 0ms, collect 297ms, tests 48ms, environment 0ms, prepare 123ms)
 

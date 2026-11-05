@@ -119,7 +119,7 @@ export class ServicoIngressos {
     ingresso.respondidoEm = confirmadoEm;
     await this.d.ingressos.salvar(ingresso);
 
-    await this.publicar("PresencaConfirmada", {
+    await this.publicar("IngressoConfirmado", {
       ingressoId: ingresso.id,
       conviteId: convite.id,
       eventoId: convite.eventoId,
@@ -161,7 +161,7 @@ export class ServicoIngressos {
     ingresso.respondidoEm = this.agora();
     await this.d.ingressos.salvar(ingresso);
 
-    await this.publicar("ConviteRecusado", {
+    await this.publicar("IngressoRecusado", {
       ingressoId: ingresso.id,
       conviteId: convite.id,
       eventoId: convite.eventoId,
@@ -214,6 +214,13 @@ export class ServicoIngressos {
     const evento = await this.obterEvento(convite.eventoId);
     if (this.agora() >= evento.inicio) throw new ErroNegocio("EVENTO_INICIADO");
     if (!evento.permiteTransferencia) throw new ErroNegocio("TRANSFERENCIA_NAO_PERMITIDA");
+    // Lab 4: um ingresso recebido por transferência não pode ser transferido de novo.
+    if (convite.conviteOrigemId !== undefined) {
+      throw new ErroNegocio(
+        "TRANSFERENCIA_NAO_PERMITIDA",
+        "Um ingresso recebido por transferência não pode ser transferido novamente.",
+      );
+    }
 
     const jaConvidado =
       mesmoEmail(substituto.email, convite.participante.email) ||
@@ -240,7 +247,7 @@ export class ServicoIngressos {
     // O ciclo recomeça para o substituto: ingresso PENDENTE ligado ao novo convite.
     await this.d.ingressos.criarPendente(novoConvite);
 
-    await this.publicar("ConviteTransferido", {
+    await this.publicar("IngressoTransferido", {
       ingressoId: ingresso.id,
       conviteId: convite.id,
       novoConviteId: novoConvite.id,

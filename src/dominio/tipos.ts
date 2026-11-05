@@ -54,10 +54,10 @@ export interface Evento {
 }
 
 export type TipoEventoDominio =
-  | "PresencaConfirmada"
-  | "ConviteRecusado"
+  | "IngressoConfirmado"
+  | "IngressoRecusado"
   | "DesistenciaRegistrada"
-  | "ConviteTransferido";
+  | "IngressoTransferido";
 
 export interface EventoDominio {
   tipo: TipoEventoDominio;

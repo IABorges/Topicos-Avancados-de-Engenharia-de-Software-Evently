@@ -532,7 +532,40 @@
       ]
     },
     {
-      "name": "18 consultarIngresso - portaria por qrCode (desistente, QR inválido)",
+      "name": "18 transferirConvite - ingresso recebido por transferência",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_maria}}"
+          }
+        ],
+        "url": "{{baseUrl}}/convites/1000/transferencia",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"dadosSubstituto\": {\n    \"nome\": \"Paulo Lima\",\n    \"email\": \"paulo.lima@empresa.com\"\n  }\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 422\", () => pm.response.to.have.status(422));",
+              "pm.test(\"codigo TRANSFERENCIA_NAO_PERMITIDA\", () => pm.expect(pm.response.json().codigo).to.eql(\"TRANSFERENCIA_NAO_PERMITIDA\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "19 consultarIngresso - portaria por qrCode (desistente, QR inválido)",
       "request": {
         "method": "GET",
         "header": [
@@ -562,7 +595,7 @@
       ]
     },
     {
-      "name": "19 consultarIngresso - organizador por conviteId",
+      "name": "20 consultarIngresso - organizador por conviteId",
       "request": {
         "method": "GET",
         "header": [
@@ -592,7 +625,7 @@
       ]
     },
     {
-      "name": "20 consultarIngresso - titular por ingressoId",
+      "name": "21 consultarIngresso - titular por ingressoId",
       "request": {
         "method": "GET",
         "header": [
@@ -622,7 +655,7 @@
       ]
     },
     {
-      "name": "21 consultarIngresso - nenhum identificador",
+      "name": "22 consultarIngresso - nenhum identificador",
       "request": {
         "method": "GET",
         "header": [
@@ -651,7 +684,7 @@
       ]
     },
     {
-      "name": "22 consultarIngresso - QR Code inexistente",
+      "name": "23 consultarIngresso - QR Code inexistente",
       "request": {
         "method": "GET",
         "header": [
@@ -680,7 +713,7 @@
       ]
     },
     {
-      "name": "23 consultarIngresso - usuário sem permissão",
+      "name": "24 consultarIngresso - usuário sem permissão",
       "request": {
         "method": "GET",
         "header": [
@@ -709,7 +742,7 @@
       ]
     },
     {
-      "name": "24 saldo de vagas do evento 1 (organizador)",
+      "name": "25 saldo de vagas do evento 1 (organizador)",
       "request": {
         "method": "GET",
         "header": [
@@ -741,7 +774,7 @@
       ]
     },
     {
-      "name": "25 eventos de domínio publicados (assíncrono)",
+      "name": "26 eventos de domínio publicados (assíncrono)",
       "request": {
         "method": "GET",
         "header": [
